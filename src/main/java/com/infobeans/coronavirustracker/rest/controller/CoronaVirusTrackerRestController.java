@@ -4,20 +4,22 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.infobeans.coronavirustracker.api.GlobalConfirmedCoronaVirusData;
 import com.infobeans.coronavirustracker.constants.ApplicationConstant;
 import com.infobeans.coronavirustracker.models.LocationStatus;
-import com.infobeans.coronavirustracker.services.CoronaVirusDataServiceImpl;
 
 @RestController
 @RequestMapping(value = ApplicationConstant.BASE_URL)
 public class CoronaVirusTrackerRestController {
 
 	@Autowired
-	CoronaVirusDataServiceImpl coronaVirusDataServiceImpl;
+	@Qualifier(value = "globalCases")
+	private GlobalConfirmedCoronaVirusData<LocationStatus> globalConfirmedCoronaVirusData;
 
 	public List<LocationStatus> locationStatus = null;
 
@@ -25,7 +27,7 @@ public class CoronaVirusTrackerRestController {
 	public List<LocationStatus> getAllGlobalConfirmedCoronaVirusAffectedCasesData() {
 
 		try {
-			locationStatus = coronaVirusDataServiceImpl.getGlobalConfirmedCoronaVirusAffectedCasesData();
+			locationStatus = globalConfirmedCoronaVirusData.getGlobalConfirmedCoronaVirusAffectedCasesData();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
