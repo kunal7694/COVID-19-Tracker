@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @author L3THAL
+ * @author
  *
  */
 @Service
@@ -41,19 +41,12 @@ public class CoronaVirusDataImpl implements GlobalConfirmedCoronaVirusData<Locat
 	@Setter
 	private List<LocationStatus> allConfirmedCases;
 
-	@Override
 	@Scheduled(cron = "* * 1 * * *")
 	public List<LocationStatus> getGlobalConfirmedCoronaVirusAffectedCasesData() throws IOException {
 		String rawCsvData = getForEntity(url, String.class);
-		this.setAllConfirmedCases(formatingCsvDataToList(rawCsvData));
-		return this.getAllConfirmedCases();
+		return formatingCsvDataToList(rawCsvData);
 	}
 
-	/**
-	 * @param rawVirusData
-	 * @return
-	 * @throws IOException
-	 */
 	private List<LocationStatus> formatingCsvDataToList(String rawCsvData) throws IOException {
 		return parseRawCsvDataToList(rawCsvData).parallelStream().map(virusData -> {
 			LocationStatus locationStatus = new LocationStatus();
@@ -66,34 +59,26 @@ public class CoronaVirusDataImpl implements GlobalConfirmedCoronaVirusData<Locat
 			locationStatus.setLatestTotalCasesFound(latestTotalCasesFound);
 			locationStatus.setDiffFromPrevDay((latestTotalCasesFound - prevDaysCases));
 			return locationStatus;
-		}).sorted((state1, state2) -> state1.getProvinceOrState().compareTo(state2.getProvinceOrState()))
-				.collect(Collectors.toList());
+		}).sorted((locationStatus1, locationStatus2) -> locationStatus1.getProvinceOrState()
+				.compareTo(locationStatus2.getProvinceOrState())).collect(Collectors.toList());
 	}
 
-	/**
-	 * @param rawVirusData
-	 * @return
-	 * @throws IOException
-	 */
 	private List<CSVRecord> parseRawCsvDataToList(String rawCsvData) throws IOException {
 		return CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new StringReader(rawCsvData)).getRecords();
 	}
 
-	/**
-	 * @return Raw Data From Pass Url
-	 */
-	private String getForEntity(String url, Class<String> clazz) {
-		return restTemplate.getForEntity(url, clazz).getBody();
+	private <T> T getForEntity(String url, Class<T> responseType) {
+		return restTemplate.getForEntity(url, responseType).getBody();
 	}
 
 	@Override
-	public List<LocationStatus> allConfirmedCases() {
+	public <T> List<LocationStatus> getTotalConfirmedCases() {
 		try {
 			this.setAllConfirmedCases(this.getGlobalConfirmedCoronaVirusAffectedCasesData());
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
-		return allConfirmedCases;
+		return this.getAllConfirmedCases();
 	}
 
 }

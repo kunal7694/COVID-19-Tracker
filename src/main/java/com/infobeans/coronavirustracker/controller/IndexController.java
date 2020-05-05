@@ -20,7 +20,7 @@ public class IndexController {
 
 	@RequestMapping(value = "/")
 	public String indexPage(Model model) {
-		List<LocationStatus> locationStats = globalConfirmedCoronaVirusData.allConfirmedCases();
+		List<LocationStatus> locationStats = globalConfirmedCoronaVirusData.getTotalConfirmedCases();
 		int totalReportedCases = locationStats.stream().mapToInt(stat -> stat.getLatestTotalCasesFound()).sum();
 		int totalNewCases = locationStats.stream().mapToInt(stat -> stat.getDiffFromPrevDay()).sum();
 		model.addAttribute("locationStats", locationStats);

@@ -1,6 +1,5 @@
 package com.infobeans.coronavirustracker.rest.controller;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +24,7 @@ public class CoronaVirusTrackerRestController {
 
 	@GetMapping(value = ApplicationConstant.GLOBAL_CONFIRMED_CORONA_VIRUS_DATA)
 	public List<LocationStatus> getAllGlobalConfirmedCoronaVirusAffectedCasesData() {
-
-		try {
-			locationStatus = globalConfirmedCoronaVirusData.getGlobalConfirmedCoronaVirusAffectedCasesData();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return locationStatus;
+		return globalConfirmedCoronaVirusData.getTotalConfirmedCases();
 	}
 
 }
