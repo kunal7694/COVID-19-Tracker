@@ -39,7 +39,7 @@ public class CoronaVirusDataServiceImpl implements GlobalConfirmedCoronaVirusDat
 
 	@Getter
 	@Setter
-	public List<LocationStatus> allConfirmedCases;
+	private List<LocationStatus> allConfirmedCases;
 
 	@Override
 	@Scheduled(cron = "* * 1 * * *")
@@ -80,7 +80,7 @@ public class CoronaVirusDataServiceImpl implements GlobalConfirmedCoronaVirusDat
 	}
 
 	/**
-	 * @return Raw Data From Pass Url
+	 * @return 
 	 */
 	private String getForEntity(String url, Class<String> clazz) {
 		return restTemplate.getForEntity(url, clazz).getBody();
