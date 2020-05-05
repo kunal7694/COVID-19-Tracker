@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+​​
+<head>
+<title>COVID-19 TRACKER</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<style type="text/css">
+.table, th {
+	text-align: center
+}
+</style>
+</head>
+
+<body>
+	<div class="container">
+		<nav class="navbar navbar-inverse">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="/">COVID-19-TRACKER</a>
+				</div>
+			</div>
+		</nav>
+		<table class="table table-bordered table-hover">
+			<tr>
+				<th>Province/State</th>
+				<th>Country/Region</th>
+				<th>Total Cases Reported</th>
+				<th>Changes Since Last Day</th>
+			</tr>
+			<tr th:each="locationStat : ${locationStats}">
+				<td th:text="${locationStat.provinceOrState}"></td>
+				<td th:text="${locationStat.countryOrRegion}"></td>
+				<td th:text="${locationStat.latestTotalCasesFound}">0</td>
+				<td th:text="${locationStat.diffFromPrevDay}">0</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>
