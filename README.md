@@ -1,2 +1,2 @@
 # COVID-19-Tracker
-Demo Learning Spring Boot Project .
+Demo Spring Boot Project To Track COVID-19 Pandemic Situation.t .
