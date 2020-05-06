@@ -17,9 +17,8 @@ public class LoggingConfiguration {
 
 	Logger logger = LoggerFactory.getLogger(LoggingConfiguration.class);
 
-	@Pointcut(value = "execution(* com.infobeans.coronavirustracker.*.*.*(..) )")
+	@Pointcut(value = "execution(* com.infobeans.coronavirustracker.*.*.*(..))")
 	public void pointCut() {
-
 	}
 
 	@Around("pointCut()")

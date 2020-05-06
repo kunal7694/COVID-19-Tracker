@@ -39,7 +39,7 @@ public class CoronaVirusDataImpl implements GlobalConfirmedCoronaVirusData<Locat
 
 	@Getter
 	@Setter
-	private List<LocationStatus> allConfirmedCases;
+	private List<LocationStatus> allConfirmedCases = null;
 
 	@Scheduled(cron = "* * 1 * * *")
 	public List<LocationStatus> getGlobalConfirmedCoronaVirusAffectedCasesData() throws IOException {
@@ -47,15 +47,23 @@ public class CoronaVirusDataImpl implements GlobalConfirmedCoronaVirusData<Locat
 		return formatingCsvDataToList(rawCsvData);
 	}
 
+	private <T> T getForEntity(String url, Class<T> responseType) {
+		return restTemplate.getForEntity(url, responseType).getBody();
+	}
+
+	private List<CSVRecord> parseRawCsvDataToList(String rawCsvData) throws IOException {
+		return CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new StringReader(rawCsvData)).getRecords();
+	}
+
 	private List<LocationStatus> formatingCsvDataToList(String rawCsvData) throws IOException {
-		return parseRawCsvDataToList(rawCsvData).parallelStream().map(virusData -> {
+		return parseRawCsvDataToList(rawCsvData).parallelStream().map(csvRecord -> {
 			LocationStatus locationStatus = new LocationStatus();
 			locationStatus
-					.setProvinceOrState(!virusData.get("Province/State").isEmpty() ? virusData.get("Province/State")
-							: virusData.get("Province/State").replace("", "Presence-Unknown"));
-			locationStatus.setCountryOrRegion(virusData.get("Country/Region"));
-			int latestTotalCasesFound = Integer.parseInt(virusData.get(virusData.size() - 1));
-			int prevDaysCases = Integer.parseInt(virusData.get(virusData.size() - 2));
+					.setProvinceOrState(!csvRecord.get("Province/State").isEmpty() ? csvRecord.get("Province/State")
+							: csvRecord.get("Province/State").replace("", "Presence-Unknown"));
+			locationStatus.setCountryOrRegion(csvRecord.get("Country/Region"));
+			int latestTotalCasesFound = Integer.parseInt(csvRecord.get(csvRecord.size() - 1));
+			int prevDaysCases = Integer.parseInt(csvRecord.get(csvRecord.size() - 2));
 			locationStatus.setLatestTotalCasesFound(latestTotalCasesFound);
 			locationStatus.setDiffFromPrevDay((latestTotalCasesFound - prevDaysCases));
 			return locationStatus;
@@ -63,22 +71,14 @@ public class CoronaVirusDataImpl implements GlobalConfirmedCoronaVirusData<Locat
 				.compareTo(locationStatus2.getProvinceOrState())).collect(Collectors.toList());
 	}
 
-	private List<CSVRecord> parseRawCsvDataToList(String rawCsvData) throws IOException {
-		return CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(new StringReader(rawCsvData)).getRecords();
-	}
-
-	private <T> T getForEntity(String url, Class<T> responseType) {
-		return restTemplate.getForEntity(url, responseType).getBody();
-	}
-
 	@Override
 	public <T> List<LocationStatus> getTotalConfirmedCases() {
 		try {
-			this.setAllConfirmedCases(this.getGlobalConfirmedCoronaVirusAffectedCasesData());
+			setAllConfirmedCases(getGlobalConfirmedCoronaVirusAffectedCasesData());
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
-		return this.getAllConfirmedCases();
+		return getAllConfirmedCases();
 	}
 
 }
