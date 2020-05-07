@@ -1,9 +1,7 @@
 package com.infobeans.coronavirustracker.logging;
 
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -17,11 +15,11 @@ public class LoggingConfiguration {
 
 	Logger logger = LoggerFactory.getLogger(LoggingConfiguration.class);
 
-	@Pointcut(value = "execution(* com.infobeans.coronavirustracker.*.*.*(..))")
+	// @Pointcut(value = "execution(* com.infobeans.coronavirustracker.*.*.*(..))")
 	public void pointCut() {
 	}
 
-	@Around("pointCut()")
+	// @Around("pointCut()")
 	public Object centralizeLogging(ProceedingJoinPoint joinPoint) {
 		Object object = null;
 		ObjectMapper mapper = new ObjectMapper();
@@ -35,9 +33,9 @@ public class LoggingConfiguration {
 			logger.info("Method " + methodName + "()" + " Returned With " + "Response : "
 					+ mapper.writeValueAsString(object));
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Throwable e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return object;
 	}

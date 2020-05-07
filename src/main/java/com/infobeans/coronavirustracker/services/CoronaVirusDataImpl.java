@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,6 +42,8 @@ public class CoronaVirusDataImpl implements GlobalConfirmedCoronaVirusData<Locat
 	@Getter
 	@Setter
 	private List<LocationStatus> allConfirmedCases = null;
+	
+	Logger logger = LoggerFactory.getLogger(CoronaVirusDataImpl.class);
 
 	@Scheduled(cron = "* * 1 * * *")
 	public List<LocationStatus> getGlobalConfirmedCoronaVirusAffectedCasesData() throws IOException {
@@ -56,11 +60,12 @@ public class CoronaVirusDataImpl implements GlobalConfirmedCoronaVirusData<Locat
 	}
 
 	private List<LocationStatus> formatingCsvDataToList(String rawCsvData) throws IOException {
+		String provinceOrStateColumnInCsv="Province/State";
 		return parseRawCsvDataToList(rawCsvData).parallelStream().map(csvRecord -> {
 			LocationStatus locationStatus = new LocationStatus();
 			locationStatus
-					.setProvinceOrState(!csvRecord.get("Province/State").isEmpty() ? csvRecord.get("Province/State")
-							: csvRecord.get("Province/State").replace("", "Presence-Unknown"));
+					.setProvinceOrState(!csvRecord.get(provinceOrStateColumnInCsv).isEmpty() ? csvRecord.get(provinceOrStateColumnInCsv)
+							: csvRecord.get(provinceOrStateColumnInCsv).replace("", "Presence-Unknown"));
 			locationStatus.setCountryOrRegion(csvRecord.get("Country/Region"));
 			int latestTotalCasesFound = Integer.parseInt(csvRecord.get(csvRecord.size() - 1));
 			int prevDaysCases = Integer.parseInt(csvRecord.get(csvRecord.size() - 2));
@@ -72,11 +77,11 @@ public class CoronaVirusDataImpl implements GlobalConfirmedCoronaVirusData<Locat
 	}
 
 	@Override
-	public <T> List<LocationStatus> getTotalConfirmedCases() {
+	public List<LocationStatus> getTotalConfirmedCases() {
 		try {
 			setAllConfirmedCases(getGlobalConfirmedCoronaVirusAffectedCasesData());
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			logger.error(e.getMessage());
 		}
 		return getAllConfirmedCases();
 	}

@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface GlobalConfirmedCoronaVirusData<R> {
 
-	public <T> List<R> getTotalConfirmedCases();
+	public List<R> getTotalConfirmedCases();
 
 }
